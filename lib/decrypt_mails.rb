@@ -63,7 +63,7 @@ module DecryptMails
       end
 
       if ignored
-        return false
+        $invalid = ignored
       end
 
       receive_without_encryption(email, options)

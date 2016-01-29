@@ -37,3 +37,9 @@ ActionDispatch::Callbacks.to_prepare do
   require_dependency 'mail_handler'
   MailHandler.send(:include, DecryptMails)
 end
+
+# allow unencrypted+unsigned mails based on per-project setting
+ActionDispatch::Callbacks.to_prepare do
+  require_dependency 'mail_handler'
+  MailHandler.send(:include, MailHandlerPatch)
+end
