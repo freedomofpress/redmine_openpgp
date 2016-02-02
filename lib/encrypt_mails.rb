@@ -111,7 +111,9 @@ module EncryptMails
         headers[field].each do |user|
 
           # encrypted
-          unless Pgpkey.find_by(user_id: user.id).nil?
+          if Pgpkey.find_by(user_id: user.id).nil?
+            logger.info "No public key found for #{user} <#{user.mail}> (#{user.id})" if logger
+          else
             recipients[:encrypted][field].push user and next
           end
 
