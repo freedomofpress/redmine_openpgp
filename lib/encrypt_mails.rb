@@ -16,6 +16,7 @@ module EncryptMails
         'document_added',
         'issue_add',
         'issue_edit',
+        'lost_password',
         'message_posted',
         'news_added',
         'news_comment_added',
@@ -34,7 +35,12 @@ module EncryptMails
         (act == 'project' and not project.try('module_enabled?', 'openpgp'))
 
       # relocate recipients
-      recipients = relocate_recipients(headers)
+      if @_action_name == 'lost_password'
+        recipients = password_reset_recipient(headers)
+      else
+        recipients = relocate_recipients(headers)
+      end
+
       header = @_message.header.to_s
 
       # render and deliver encrypted mail
@@ -145,6 +151,53 @@ module EncryptMails
 
     end
 
+    def find_key_by_email(email)
+
+      user = User.find_by_mail(email)
+      user_key = Pgpkey.find_by user_id: user.id
+      unless user_key.nil?
+        return user_key.fpr
+      end
+
+    end
+
+    # handles headers for password reset emails, which have a single recipient
+    def password_reset_recipient(headers)
+
+      # hash to be returned
+      recipient = {
+        :encrypted => {:to => []},
+        :blocked => {:to => []},
+        :filtered  => {:to => []},
+        :unchanged => {:to => []},
+        :lost => {:to => []}
+      }
+
+      user = User.find_by_mail(headers[:to])
+      user_key = Pgpkey.find_by(user_id: user.id)
+
+      if user_key.nil?
+        logger.info "No public key found for #{user} <#{user.mail}> (#{user.id})" if logger
+      else
+        recipient[:encrypted][:to].push user
+      end
+
+      # unencrypted
+      case Setting.plugin_openpgp['unencrypted_mails']
+        when 'blocked'
+          recipient[:blocked][:to].push user
+        when 'filtered'
+          recipient[:filtered][:to].push user if user_key.nil?
+        when 'unchanged'
+          recipient[:unchanged][:to].push user if user_key.nil?
+        else
+          recipient[:lost][:to].push user
+      end
+
+      recipient
+
+    end
+
     # prepares the headers for different configurations
     def prepare_headers(headers, recipients, encrypt, sign)
 
@@ -165,6 +218,9 @@ module EncryptMails
         h[:gpg][:encrypt] = true
         # add pgp keys for emails
         h[:gpg][:keys] = {}
+        if @_action_name == 'lost_password'
+          h[:gpg][:keys][h[:to]] = find_key_by_email(headers[:to])
+        else
         [:to, :cc].each do |field|
           h[field].each do |user|
             user_key = Pgpkey.find_by user_id: user.id
@@ -172,6 +228,7 @@ module EncryptMails
               h[:gpg][:keys][user.mail] = user_key.fpr
             end
           end unless h[field].blank?
+         end
         end
       end
 
