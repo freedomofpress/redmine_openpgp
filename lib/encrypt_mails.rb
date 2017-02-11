@@ -118,11 +118,16 @@ module EncryptMails
       [:to, :cc].each do |field|
         headers[field].each do |user|
 
-          # encrypted
-          if Pgpkey.find_by(user_id: user.id).nil?
-            logger.info "No public key found for #{user} <#{user.mail}> (#{user.id})" if logger
-          else
-            recipients[:encrypted][field].push user and next
+          # Try to catch case where an email was passed where the address isnt a current user
+          begin
+            # encrypted
+            if Pgpkey.find_by(user_id: user.id).nil?
+              logger.info "No public key found for #{user} <#{user.mail}> (#{user.id})" if logger
+            else
+              recipients[:encrypted][field].push user and next
+            end
+          rescue NoMethodError
+            logger.info "Tried to encrypt non-system user #{user}"
           end
 
           # unencrypted
