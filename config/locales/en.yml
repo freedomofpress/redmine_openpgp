@@ -60,7 +60,6 @@ en:
   filtered_mail_document_added: Document added
   filtered_mail_issue_add: Issue added
   filtered_mail_issue_edit: Issue edited
-  filtered_mail_lost_password: Password requested. Add a PGP key (or contact the administrator) to receive a reset link.
   filtered_mail_message_posted: Message added
   filtered_mail_news_added: News added
   filtered_mail_news_comment_added: Comment added

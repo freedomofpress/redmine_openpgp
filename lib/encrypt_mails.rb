@@ -16,7 +16,6 @@ module EncryptMails
         'document_added',
         'issue_add',
         'issue_edit',
-        'lost_password',
         'message_posted',
         'news_added',
         'news_comment_added',
@@ -34,12 +33,6 @@ module EncryptMails
       return mail_without_relocation(headers, &block) if
         act == 'none' or not actions.include? @_action_name or
         (act == 'project' and not project.try('module_enabled?', 'openpgp') and not @_action_name == 'lost_password')
-
-      # email headers for password resets contain a single recipient e-mail address instead of an array of users
-      # so we need to rewrite them to work with the relocate_recipients function
-      if @_action_name == 'lost_password'
-        headers = password_reset_headers(headers)
-      end
 
       # relocate recipients
       recipients = relocate_recipients(headers)
@@ -158,13 +151,6 @@ module EncryptMails
 
     end
 
-    def password_reset_headers(headers)
-
-      headers[:to] = [User.find_by_mail(headers[:to])]
-      headers
-
-    end
-
     # prepares the headers for different configurations
     def prepare_headers(headers, recipients, encrypt, sign)
 
@@ -192,7 +178,6 @@ module EncryptMails
               h[:gpg][:keys][user.mail] = user_key.fpr
             end
           end unless h[field].blank?
-         end
       end
 
       # headers for signature
