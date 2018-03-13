@@ -178,6 +178,7 @@ module EncryptMails
               h[:gpg][:keys][user.mail] = user_key.fpr
             end
           end unless h[field].blank?
+        end
       end
 
       # headers for signature
