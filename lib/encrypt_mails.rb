@@ -107,7 +107,7 @@ module EncryptMails
 
     # relocation of reciepients
     [:to, :cc].each do |field|
-      headers[field].each do |user|
+      Array(headers[field]).each do |user|
 
         # Try to catch case where an email was passed where the address isnt a current user
         begin
