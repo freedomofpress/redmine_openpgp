@@ -1,3 +1,5 @@
+require "io/console"
+
 desc <<-END_DESC
 Generate the private PGP key for the redmine server.
 Warning: will override and delete the existing one.

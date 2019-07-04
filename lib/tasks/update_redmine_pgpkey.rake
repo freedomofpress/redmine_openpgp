@@ -1,3 +1,5 @@
+require "io/console"
+
 desc <<-END_DESC
 Update the private PGP key and passphrase for the redmine server.
 Warning: will override and delete the existing one.
