@@ -1,15 +1,6 @@
 module DecryptMails
 
-  def self.included(base) # :nodoc:
-    base.send(:include, InstanceMethods)
-    base.class_eval do
-      alias_method_chain :receive, :encryption
-    end
-  end
-
-  module InstanceMethods
-
-    def receive_with_encryption(email, options={})
+    def receive(email, options={})
 
       # Extract useful metadata for logging
       sender_email = email.from.to_a.first.to_s.strip
@@ -66,9 +57,8 @@ module DecryptMails
         $invalid = ignored
       end
 
-      receive_without_encryption(email, options)
+      super(email, options)
 
     end
 
-  end
 end

@@ -26,20 +26,14 @@ Redmine::Plugin.register :openpgp do
     :if => Proc.new { User.current.logged? }
 end
 
-# encrypt outgoing mails
-ActionDispatch::Callbacks.to_prepare do
+Rails.configuration.to_prepare do
+  # encrypt outgoing mails
   require_dependency 'mailer'
-  Mailer.send(:include, EncryptMails)
-end
+  Mailer.send(:prepend, EncryptMails)
 
-# decrypt received mails
-ActionDispatch::Callbacks.to_prepare do
+  # decrypt received mails
   require_dependency 'mail_handler'
-  MailHandler.send(:include, DecryptMails)
-end
-
-# allow unencrypted+unsigned mails based on per-project setting
-ActionDispatch::Callbacks.to_prepare do
-  require_dependency 'mail_handler'
-  MailHandler.send(:include, MailHandlerPatch)
+  MailHandler.send(:prepend, DecryptMails)
+  # allow unencrypted+unsigned mails based on per-project setting
+  MailHandler.send(:prepend, MailHandlerPatch)
 end

@@ -1,14 +1,5 @@
 module EncryptMails
 
-  def self.included(base) # :nodoc:
-    base.send(:include, InstanceMethods)
-    base.class_eval do
-      alias_method_chain :mail, :relocation
-    end
-  end
-
-  module InstanceMethods
-
     # action names to be processed by this plugin
     def actions
       [
@@ -26,12 +17,12 @@ module EncryptMails
     end
 
     # dispatched mail method
-    def mail_with_relocation(headers={}, &block)
+    def mail(headers={}, &block)
 
       # pass unchanged, if action does not match or plugin is inactive
       act = Setting.plugin_openpgp['activation']
       # no project defined during the lost_password action, so we need to handle special case when act == 'project' instead of 'all'
-      return mail_without_relocation(headers, &block) if
+      return super(headers, &block) if
         act == 'none' or not actions.include? @_action_name or
         (act == 'project' and not project.try('module_enabled?', 'openpgp') and not @_action_name == 'lost_password')
 
@@ -47,7 +38,7 @@ module EncryptMails
 
       # render and deliver encrypted mail
       reset(header)
-      m = mail_without_relocation prepare_headers(
+      m = super prepare_headers(
         headers, recipients[:encrypted], encrypt = true, sign = true
       ) do |format|
         format.text
@@ -59,7 +50,7 @@ module EncryptMails
       # render and deliver filtered mail
       reset(header)
       tpl = @_action_name + '.filtered'
-      m = mail_without_relocation prepare_headers(
+      m = super prepare_headers(
         headers, recipients[:filtered], encrypt = false, sign = true
       ) do |format|
         format.text { render tpl }
@@ -69,7 +60,7 @@ module EncryptMails
 
       # render unchanged mail (deliverd by calling method)
       reset(header)
-      m = mail_without_relocation prepare_headers(
+      m = super prepare_headers(
         headers, recipients[:unchanged], encrypt = false, sign = false
       ) do |format|
         format.text
@@ -209,5 +200,4 @@ module EncryptMails
 
     end
 
-  end
 end
