@@ -1,5 +1,4 @@
 class PgpkeysController < ApplicationController
-  unloadable
 
   def index
     @server_pgpkey = Pgpkey.find_by user_id: 0
@@ -14,34 +13,28 @@ class PgpkeysController < ApplicationController
     @user_id = params['user_id'].to_i
     @secret = params['secret']
 
-    # sanity checks
+    # sanity checks FIXME move these to some kind of form object
     flash[:error] = l(:flash_key_exists) and return if key_exists?
     flash[:error] = (@user_id == 0 ? l(:flash_private_key_not_valid) : l(:flash_public_key_not_valid)) and
       return if not key_valid?
     flash[:error] = l(:flash_update_not_allowed) and return if not update_allowed?
     flash[:warning] = l(:flash_no_secret) if @user_id == 0 and @secret == ''
 
-    # save key into gpg key ring
-    gpgme_import = GPGME::Key.import(@key)
-    flash[:error] = l(:flash_import_error) and return if gpgme_import.imports.empty?
-    gpgme_key = GPGME::Key.get(gpgme_import.imports[0].fpr)
-    @fpr = gpgme_key.fingerprint
+    key = nil
+    begin
+      unless key = Pgpkey.import(user_id: @user_id, key: @key, secret: @secret)
 
-    # test secret
-    if @user_id == 0
-      gpgme = GPGME::Crypto.new
-      enc = gpgme.encrypt('test', {:recipients => @fpr, :always_trust => true}).to_s
-      begin
-        dec = gpgme.decrypt(enc, :password => @secret).to_s
-      rescue GPGME::Error::BadPassphrase
-        gpgme_key.delete!(true)
-        flash.delete(:warning)
-        flash[:error] = l(:flash_bad_passphrase) and return
+        flash[:error] = l(:flash_import_error)
+        return
       end
+    rescue GPGME::Error::BadPassphrase
+      flash.delete(:warning)
+      flash[:error] = l(:flash_bad_passphrase)
+      return
     end
 
-    # save key to db
-    if Pgpkey.create(:user_id => @user_id, :fpr => @fpr, :secret => @secret)
+    if key.persisted?
+      @fpr = key.fpr
       flash[:notice] = l(:flash_create_successful)
     else
       flash[:error] = l(:flash_unknown_error)
