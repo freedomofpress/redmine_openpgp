@@ -67,28 +67,63 @@ class EncryptedMailerTest < ActiveSupport::TestCase
   end
 
   test "should encrypt security notification" do
-    skip "not yet implemented"
     user = User.find 1
-    Pgpkey.import user_id: 1, key: @pub_key
     set_language_if_valid user.language
+    k = generate_key email: user.mail, password: 'abc'
+    Pgpkey.create user_id: user.id, fpr: k.fingerprint
 
-    with_settings emails_footer: "footer without link" do
+    with_settings emails_footer: "footer" do
       sender = User.find(2)
       sender.remote_ip = '192.168.1.1'
       assert Mailer.deliver_security_notification(user, sender, message: :notice_account_password_updated)
 
-      assert mail = decrypt_email(to: user.mail)
-      assert_mail_body_match sender.login, mail
-      assert_mail_body_match '192.168.1.1', mail
-      assert_mail_body_match I18n.t(:notice_account_password_updated), mail
+      assert mail = decrypt_email(to: user.mail, password: 'abc')
+      assert_include sender.login, mail.decoded
+      assert_include '192.168.1.1', mail.decoded
+      assert_include I18n.t(:notice_account_password_updated), mail.decoded
+      assert_include "footer", mail.decoded
     end
+  end
+
+  test "should filter mail when user has no key" do
+    user = User.find 1
+    set_language_if_valid user.language
+
+    with_settings emails_footer: "footer" do
+      sender = User.find(2)
+      sender.remote_ip = '192.168.1.1'
+      assert Mailer.deliver_security_notification(user, sender, message: :notice_account_password_updated)
+
+      assert mail = last_email(to: user.mail)
+      assert text = mail.text_part
+      assert_not_include sender.login, text.decoded
+      assert_not_include '192.168.1.1', text.decoded
+      assert_not_include I18n.t(:notice_account_password_updated), text.decoded
+      assert_include "footer", text.decoded
+      assert_include "This mail was filtered", text.decoded
+    end
+  end
+
+  test "should encrypt settings update notification" do
+    user = User.find 1
+    set_language_if_valid user.language
+    k = generate_key email: user.mail, password: 'abc'
+    Pgpkey.create user_id: user.id, fpr: k.fingerprint
+
+    user.remote_ip = '192.168.1.1'
+    assert Mailer.deliver_settings_updated(user, %w(host_name))
+
+    assert mail = decrypt_email(to: user.mail, password: 'abc')
+    assert_include 'settings were changed', mail.decoded
+    assert_include 'Host name and path', mail.decoded
+    assert_include '192.168.1.1', mail.decoded
+    assert_include user.login, mail.decoded
   end
 
   private
 
   def decrypt_email(to:, password: nil)
-    mail = ActionMailer::Base.deliveries.detect{|m|Array(m.bcc).include? to}
-    assert mail.present?, "no mail for #{to} found"
+    mail = last_email to: to
     encrypted = mail.parts.detect{|p| p.content_type =~ /encrypted\.asc/}
     assert encrypted.present?, "found email to #{to} but it's not encrypted"
     assert clear = GPGME::Crypto.new.decrypt(encrypted.body.to_s, password: password)
@@ -104,9 +139,13 @@ class EncryptedMailerTest < ActiveSupport::TestCase
     ActionMailer::Base.deliveries.map(&:bcc).flatten.sort
   end
 
-  def last_email
-    mail = ActionMailer::Base.deliveries.last
-    assert_not_nil mail
+  def last_email(to: nil)
+    mail = if to
+      ActionMailer::Base.deliveries.detect{|m|Array(m.bcc).include? to}
+    else
+      ActionMailer::Base.deliveries.last
+    end
+    assert_not_nil mail, "no mail for #{to.presence || "any recipient"} found"
     mail
   end
 

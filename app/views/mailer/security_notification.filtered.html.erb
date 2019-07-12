@@ -1,0 +1,21 @@
+<h1><%= l(:filtered_mail_security_notification) %></h1>
+
+<p>
+<% if @url %>
+  <%= link_to @url %>
+<% else %>
+  <%= @title %>
+<% end %>
+</p>
+
+<p>
+    <%= l(:filtered_mail_footer) %>
+    <%= link_to l(:header_openpgp),
+                Setting['protocol'] + '://' + Setting['host_name'] + '/pgp' %>
+</p>
+
+<% if Setting.plugin_openpgp['filtered_mail_footer'].present? %>
+<p>
+    <%= Setting.plugin_openpgp['filtered_mail_footer'].html_safe %>
+</p>
+<% end %>

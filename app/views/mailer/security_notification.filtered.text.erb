@@ -1,0 +1,13 @@
+<%= l(:filtered_mail_security_notification) %>
+
+<%= @url || @title %>
+
+----------------------------------------
+
+<%= l(:filtered_mail_footer) %>
+<%= Setting['protocol'] + '://' + Setting['host_name'] + '/pgp' %>
+
+<% if Setting.plugin_openpgp['filtered_mail_footer'].present? -%>
+<%= Setting.plugin_openpgp['filtered_mail_footer'] %>
+<% end -%>
+

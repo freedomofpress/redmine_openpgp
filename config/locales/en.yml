@@ -64,5 +64,6 @@ en:
   filtered_mail_message_posted: Message added
   filtered_mail_news_added: News added
   filtered_mail_news_comment_added: Comment added
+  filtered_mail_security_notification: Security notification
   filtered_mail_wiki_content_added: Page added
   filtered_mail_wiki_content_updated: Page edited

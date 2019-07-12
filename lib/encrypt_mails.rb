@@ -11,6 +11,8 @@ module EncryptMails
       'message_posted',
       'news_added',
       'news_comment_added',
+      'security_notification',
+      'settings_updated',
       'wiki_content_added',
       'wiki_content_updated'
     ]
