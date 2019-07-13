@@ -1,37 +1,40 @@
+# frozen_string_literal: true
+
 module EncryptMails
 
   # action names to be processed by this plugin
-  def actions
-    [
-      'attachments_added',
-      'document_added',
-      'issue_add',
-      'issue_edit',
-      'lost_password',
-      'message_posted',
-      'news_added',
-      'news_comment_added',
-      'security_notification',
-      'settings_updated',
-      'wiki_content_added',
-      'wiki_content_updated'
-    ]
-  end
+  ENCRYPT_ACTIONS = %w(
+    attachments_added
+    document_added
+    issue_add
+    issue_edit
+    lost_password
+    message_posted
+    news_added
+    news_comment_added
+    security_notification
+    settings_updated
+    wiki_content_added
+    wiki_content_updated
+  )
+
+  GLOBAL_ACTIONS = %w(
+    lost_password
+    security_notification
+    settings_updated
+  )
 
   # dispatched mail method
   def mail(headers={}, &block)
 
-    # pass unchanged, if action does not match or plugin is inactive
-    act = Setting.plugin_openpgp['activation']
-    # no project defined during the lost_password action, so we need to handle special case when act == 'project' instead of 'all'
-    return super(headers, &block) if
-    act == 'none' or not actions.include? @_action_name or
-      (act == 'project' and not project.try('module_enabled?', 'openpgp') and not @_action_name == 'lost_password')
+    # no project defined during the lost_password action, so we need to handle
+    # special case when act == 'project' instead of 'all'
+    active = RedmineOpenpgp.active_on_project?(
+      project, global: GLOBAL_ACTIONS.include?(@_action_name)
+    )
 
-    # email headers for password resets contain a single recipient e-mail address instead of an array of users
-    # so we need to rewrite them to work with the relocate_recipients function
-    if @_action_name == 'lost_password'
-      headers = password_reset_headers(headers)
+    unless active and ENCRYPT_ACTIONS.include?(@_action_name)
+      return super
     end
 
     # relocate recipients
@@ -148,13 +151,6 @@ module EncryptMails
     @_mail_was_called = false
     @_message = Mail.new
     @_message.header header
-
-  end
-
-  def password_reset_headers(headers)
-
-    headers[:to] = [User.find_by_mail(headers[:to])]
-    headers
 
   end
 

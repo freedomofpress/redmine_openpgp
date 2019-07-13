@@ -13,7 +13,7 @@ Redmine::Plugin.register :openpgp do
   url 'https://github.com/C3S/redmine_openpgp'
   settings(:default => {
     'signature_needed' => false,
-    'encryption_scope' => 'project',
+    'activation' => 'project',
     'unencrypted_mails' => 'filtered',
     'encrypted_html' => false,
     'filtered_mail_footer' => ''
