@@ -1,3 +1,2 @@
 # -*- coding: utf-8 -*-
-#gem "gpgme"
-gem 'mail-gpg'
+gem 'mail-gpg', '~> 0.4.1'
