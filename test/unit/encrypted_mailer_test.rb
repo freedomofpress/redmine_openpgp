@@ -17,6 +17,7 @@ class EncryptedMailerTest < ActiveSupport::TestCase
     ActionMailer::Base.deliveries.clear
     Setting.plain_text_mail = '0'
     Setting.default_language = 'en'
+    Setting.emails_footer = "footer"
     User.current = nil
     Pgpkey.import user_id: 0, key: read_key("pgp.server.private.asc")
   end
@@ -30,8 +31,7 @@ class EncryptedMailerTest < ActiveSupport::TestCase
     k = generate_key email: user1.mail, password: 'abc'
     Pgpkey.create user_id: user1.id, fpr: k.fingerprint
 
-    with_settings(plugin_openpgp: {"signature_needed"=>false, "encryption_scope"=>"project", "unencrypted_mails"=>"filtered", "encrypted_html"=>true, "filtered_mail_footer"=>"" }) do
-
+    with_plugin_settings("activation" => "all", "encrypted_html" => true) do
       news = News.find(1)
       news.project.enabled_module('news').add_watcher(user1)
       Mailer.deliver_news_added(news)
@@ -46,6 +46,47 @@ class EncryptedMailerTest < ActiveSupport::TestCase
   end
 
 
+  test "should not encrypt news_added notification when not active for project" do
+    user1 = User.generate!
+    k = generate_key email: user1.mail, password: 'abc'
+    Pgpkey.create user_id: user1.id, fpr: k.fingerprint
+
+    user2 = User.generate!
+    k = generate_key email: user2.mail, password: 'def'
+    Pgpkey.create user_id: user2.id, fpr: k.fingerprint
+
+    news = News.find(1)
+    with_plugin_settings("activation" => "project") do
+      news.project.enabled_module('news').add_watcher(user1)
+      Mailer.deliver_news_added(news)
+      assert m = last_email
+      assert_include "eCookbook first release", m.text_part.decoded
+    end
+  end
+
+  test "should encrypt news_added notification when active for project" do
+    user1 = User.generate!
+    k = generate_key email: user1.mail, password: 'abc'
+    Pgpkey.create user_id: user1.id, fpr: k.fingerprint
+
+    user2 = User.generate!
+    k = generate_key email: user2.mail, password: 'def'
+    Pgpkey.create user_id: user2.id, fpr: k.fingerprint
+
+    news = News.find(1)
+    news.project.enabled_modules.create! name: 'openpgp'
+    with_plugin_settings("activation" => "project") do
+      news.project.enabled_module('news').add_watcher(user1)
+      Mailer.deliver_news_added(news)
+
+      assert_include user1.mail, recipients
+      assert_not_include user2.mail, recipients
+
+      assert m = decrypt_email(to: user1.mail, password: 'abc')
+      assert_include "eCookbook first release", m.decoded
+    end
+  end
+
   test "should encrypt news_added notification" do
     user1 = User.generate!
     k = generate_key email: user1.mail, password: 'abc'
@@ -56,14 +97,16 @@ class EncryptedMailerTest < ActiveSupport::TestCase
     Pgpkey.create user_id: user2.id, fpr: k.fingerprint
 
     news = News.find(1)
-    news.project.enabled_module('news').add_watcher(user1)
-    Mailer.deliver_news_added(news)
+    with_plugin_settings("activation" => "all") do
+      news.project.enabled_module('news').add_watcher(user1)
+      Mailer.deliver_news_added(news)
 
-    assert_include user1.mail, recipients
-    assert_not_include user2.mail, recipients
+      assert_include user1.mail, recipients
+      assert_not_include user2.mail, recipients
 
-    assert m = decrypt_email(to: user1.mail, password: 'abc')
-    assert_include "eCookbook first release", m.decoded
+      assert m = decrypt_email(to: user1.mail, password: 'abc')
+      assert_include "eCookbook first release", m.decoded
+    end
   end
 
   test "should encrypt security notification" do
@@ -72,7 +115,7 @@ class EncryptedMailerTest < ActiveSupport::TestCase
     k = generate_key email: user.mail, password: 'abc'
     Pgpkey.create user_id: user.id, fpr: k.fingerprint
 
-    with_settings emails_footer: "footer" do
+    with_plugin_settings("activation" => "all") do
       sender = User.find(2)
       sender.remote_ip = '192.168.1.1'
       assert Mailer.deliver_security_notification(user, sender, message: :notice_account_password_updated)
@@ -85,11 +128,11 @@ class EncryptedMailerTest < ActiveSupport::TestCase
     end
   end
 
-  test "should filter mail when user has no key" do
+  test "should filter mail when active and user has no key" do
     user = User.find 1
     set_language_if_valid user.language
 
-    with_settings emails_footer: "footer" do
+    with_plugin_settings("activation" => "all") do
       sender = User.find(2)
       sender.remote_ip = '192.168.1.1'
       assert Mailer.deliver_security_notification(user, sender, message: :notice_account_password_updated)
@@ -104,20 +147,61 @@ class EncryptedMailerTest < ActiveSupport::TestCase
     end
   end
 
-  test "should encrypt settings update notification" do
+  test "should not encrypt settings update notification when not active" do
     user = User.find 1
     set_language_if_valid user.language
     k = generate_key email: user.mail, password: 'abc'
     Pgpkey.create user_id: user.id, fpr: k.fingerprint
 
     user.remote_ip = '192.168.1.1'
-    assert Mailer.deliver_settings_updated(user, %w(host_name))
 
-    assert mail = decrypt_email(to: user.mail, password: 'abc')
-    assert_include 'settings were changed', mail.decoded
-    assert_include 'Host name and path', mail.decoded
-    assert_include '192.168.1.1', mail.decoded
-    assert_include user.login, mail.decoded
+    with_plugin_settings("activation" => "none") do
+      assert Mailer.deliver_settings_updated(user, %w(host_name))
+
+      assert mail = last_email.text_part
+      assert_include 'settings were changed', mail.decoded
+      assert_include 'Host name and path', mail.decoded
+      assert_include '192.168.1.1', mail.decoded
+      assert_include user.login, mail.decoded
+    end
+  end
+
+  test "should encrypt settings update notification with global activation" do
+    user = User.find 1
+    set_language_if_valid user.language
+    k = generate_key email: user.mail, password: 'abc'
+    Pgpkey.create user_id: user.id, fpr: k.fingerprint
+
+    user.remote_ip = '192.168.1.1'
+
+    with_plugin_settings("activation" => "all") do
+      assert Mailer.deliver_settings_updated(user, %w(host_name))
+
+      assert mail = decrypt_email(to: user.mail, password: 'abc')
+      assert_include 'settings were changed', mail.decoded
+      assert_include 'Host name and path', mail.decoded
+      assert_include '192.168.1.1', mail.decoded
+      assert_include user.login, mail.decoded
+    end
+  end
+
+  test "should encrypt settings update notification with project activation" do
+    user = User.find 1
+    set_language_if_valid user.language
+    k = generate_key email: user.mail, password: 'abc'
+    Pgpkey.create user_id: user.id, fpr: k.fingerprint
+
+    user.remote_ip = '192.168.1.1'
+
+    with_plugin_settings("activation" => "project") do
+      assert Mailer.deliver_settings_updated(user, %w(host_name))
+
+      assert mail = decrypt_email(to: user.mail, password: 'abc')
+      assert_include 'settings were changed', mail.decoded
+      assert_include 'Host name and path', mail.decoded
+      assert_include '192.168.1.1', mail.decoded
+      assert_include user.login, mail.decoded
+    end
   end
 
   private

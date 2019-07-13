@@ -1,6 +1,21 @@
 # Load the Redmine helper
 require File.expand_path(File.dirname(__FILE__) + '/../../../test/test_helper')
 
+ActiveSupport::TestCase.class_eval do
+  def with_plugin_settings(settings = {})
+    with_settings(plugin_openpgp: {
+      'activation' => 'all',
+      'signature_needed' => false,
+      'encryption_scope' => 'project',
+      'unencrypted_mails' => 'filtered',
+      'encrypted_html' => false,
+      'filtered_mail_footer' => '',
+    }.merge(settings)) do
+      yield
+    end
+  end
+end
+
 module PgpTestHelper
 
   def read_key(name)

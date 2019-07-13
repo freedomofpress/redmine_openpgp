@@ -28,12 +28,8 @@ end
 
 Rails.configuration.to_prepare do
   # encrypt outgoing mails
-  require_dependency 'mailer'
   Mailer.send(:prepend, EncryptMails)
 
-  # decrypt received mails
-  require_dependency 'mail_handler'
+  # decrypt received mails, handle them based on signature requirements
   MailHandler.send(:prepend, DecryptMails)
-  # allow unencrypted+unsigned mails based on per-project setting
-  MailHandler.send(:prepend, MailHandlerPatch)
 end
