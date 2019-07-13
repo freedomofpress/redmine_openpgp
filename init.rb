@@ -1,9 +1,6 @@
 #!/bin/env ruby
 # encoding: utf-8
 
-require 'gpgme'
-require 'mail-gpg'
-
 Redmine::Plugin.register :openpgp do
   name 'OpenPGP'
   author 'Alexander Blum'
@@ -28,8 +25,8 @@ end
 
 Rails.configuration.to_prepare do
   # encrypt outgoing mails
-  Mailer.send(:prepend, EncryptMails)
+  Mailer.send(:prepend, RedmineOpenpgp::EncryptMails)
 
   # decrypt received mails, handle them based on signature requirements
-  MailHandler.send(:prepend, DecryptMails)
+  MailHandler.send(:prepend, RedmineOpenpgp::DecryptMails)
 end
