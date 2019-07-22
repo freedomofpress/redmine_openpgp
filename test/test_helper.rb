@@ -6,7 +6,6 @@ ActiveSupport::TestCase.class_eval do
     with_settings(plugin_openpgp: {
       'activation' => 'all',
       'signature_needed' => false,
-      'encryption_scope' => 'project',
       'unencrypted_mails' => 'filtered',
       'encrypted_html' => false,
       'filtered_mail_footer' => '',
