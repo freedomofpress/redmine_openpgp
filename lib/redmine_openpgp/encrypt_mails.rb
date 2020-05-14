@@ -38,6 +38,12 @@ module RedmineOpenpgp
         return super
       end
 
+      # email headers for password resets contain a single recipient e-mail address instead of an array of users
+      # so we need to rewrite them to work with the relocate_recipients function
+      if @_action_name == 'lost_password'
+        headers = password_reset_headers(headers)
+      end
+
       # relocate recipients
       recipients = relocate_recipients(headers)
       header = @_message.header.to_s
@@ -99,7 +105,16 @@ module RedmineOpenpgp
 
     end
 
-    # relocates reciepients (to, cc) of message
+    # loads a user object by e-mail (necessary for password reset emails
+    # if we want to be able to look up their PGP key)
+    def password_reset_headers(headers)
+
+      headers[:to] = [User.find_by_mail(headers[:to])]
+      headers
+
+    end
+
+    # relocates recipients (to, cc) of message
     def relocate_recipients(headers)
 
       # hash to be returned
@@ -111,11 +126,11 @@ module RedmineOpenpgp
         :lost      => {:to => [], :cc => []}
       }
 
-      # relocation of reciepients
+      # relocation of recipients
       [:to, :cc].each do |field|
         Array(headers[field]).each do |user|
 
-          # Try to catch case where an email was passed where the address isnt a current user
+          # Try to catch case where an email was passed where the address isn't a current user
           begin
             # encrypted
             if Pgpkey.find_by(user_id: user.id).nil?
