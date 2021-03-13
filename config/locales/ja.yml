@@ -2,26 +2,26 @@ ja:
   header_openpgp: PGP 鍵管理
   subheader_openpgp_incoming: 受信
   subheader_openpgp_outgoing: 送信
-  subheader_save_key: 作成済みの鍵を保存する
-  subheader_generate_key: 新たな鍵を生成する
+  subheader_save_key: 作成済みの秘密鍵を保存する
+  subheader_generate_key: 新たな秘密鍵を生成する
   label_openpgp_activation: Plugin activation
   label_unencrypted_mails: Unencrypted mails
   label_signature_needed: Valid signatures only
   label_encrypted_html: HTML in encrypted mails
   label_filtered_mail_footer: Custom footer of filtered mails
-  label_public_key: Public PGP key
-  label_private_key: Private PGP key
+  label_public_key: PGP公開鍵
+  label_private_key: PGP秘密鍵
   label_fingerprint: Fingerprint
   label_metadata: Metadata
-  label_key_type: Key type
-  label_key_length: Key length
-  label_subkey_type: Subkey type
-  label_subkey_length: Subkey length
-  label_name_real: Name
-  label_name_comment: Comment
-  label_name_email: Email
-  label_expire_date: Expire date
-  label_secret: Passphrase
+  label_key_type: 主鍵タイプ
+  label_key_length: 主鍵長
+  label_subkey_type: 副鍵タイプ
+  label_subkey_length: 副鍵長
+  label_name_real: 名前
+  label_name_comment: コメント
+  label_name_email: メールアドレス
+  label_expire_date: 有効期限
+  label_secret: パスフレーズ
   option_activation_all: for all projects
   option_activation_project: dependent on project settings
   option_activation_none: deactivated
@@ -37,7 +37,7 @@ ja:
   note_user_public_key_given: This PGP key is used to encrypt mails by Redmine
   note_server_public_key_missing: No key given. Please contact your administrator if you want to send encrypted mails to Redmine.
   note_server_public_key_given: Use this public PGP key to encrypt mails for Redmine
-  note_server_private_key_create: Redmineに送信されるメールを暗号化するにはRedmineのPGP秘密鍵を登録します
+  note_server_private_key_create: Redmineに送信されるメールを暗号化するにはRedmineのPGP秘密鍵を保存します
   note_server_private_key_generate: Redmineに送信されるメールを暗号化するにはRedmineのPGP秘密鍵を生成します
   note_receiving_emails: Redmineでメールを受信するように設定されている必要があります。参照：
   note_cleartext_create: "HTTPでは秘密鍵とパスフレーズは平文で送信されます。HTTPSであることを確認してください。（サーバ側でRakeタスクの使用を推奨）: "
