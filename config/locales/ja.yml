@@ -4,15 +4,15 @@ ja:
   subheader_openpgp_outgoing: 送信
   subheader_save_key: 作成済みの秘密鍵を保存する
   subheader_generate_key: 新たな秘密鍵を生成する
-  label_openpgp_activation: Plugin activation
-  label_unencrypted_mails: Unencrypted mails
-  label_signature_needed: Valid signatures only
+  label_openpgp_activation: プラグインの有効化対象
+  label_unencrypted_mails: 暗号化しないメール
+  label_signature_needed: 有効な署名が必要
   label_encrypted_html: HTML in encrypted mails
-  label_filtered_mail_footer: Custom footer of filtered mails
+  label_filtered_mail_footer: フィルタされたメールフッタのカスタマイズ
   label_public_key: PGP公開鍵
   label_private_key: PGP秘密鍵
-  label_fingerprint: Fingerprint
-  label_metadata: Metadata
+  label_fingerprint: ハッシュ値
+  label_metadata: メタデータ
   label_key_type: 主鍵タイプ
   label_key_length: 主鍵長
   label_subkey_type: 副鍵タイプ
@@ -22,48 +22,48 @@ ja:
   label_name_email: メールアドレス
   label_expire_date: 有効期限
   label_secret: パスフレーズ
-  option_activation_all: for all projects
-  option_activation_project: dependent on project settings
-  option_activation_none: deactivated
-  option_unencrypted_mails_blocked: blocked
-  option_unencrypted_mails_filtered: filtered
-  option_unencrypted_mails_unchanged: unchanged
+  option_activation_all: 全プロジェクト
+  option_activation_project: プロジェクト毎に設定
+  option_activation_none: なし
+  option_unencrypted_mails_blocked: 送信しない
+  option_unencrypted_mails_filtered: チケットのリンクのみ送信する
+  option_unencrypted_mails_unchanged: 内容を変更せずに送信する
   button_create: 保存
   button_delete: 削除
   button_generate: 生成
-  note_login: Please log in to manage PGP keys.
+  note_login: PGP鍵管理をするにはログインしてください
   note_admin_only: Redmine ServerのPGP秘密鍵およびパスフレーズを変更できるのは管理者のみです
   note_user_public_key_missing: Redmineからのメールを暗号化して受信するには、あなたのPGP公開鍵を登録してください
-  note_user_public_key_given: This PGP key is used to encrypt mails by Redmine
-  note_server_public_key_missing: No key given. Please contact your administrator if you want to send encrypted mails to Redmine.
-  note_server_public_key_given: Use this public PGP key to encrypt mails for Redmine
-  note_server_private_key_create: Redmineに送信されるメールを暗号化するにはRedmineのPGP秘密鍵を保存します
-  note_server_private_key_generate: Redmineに送信されるメールを暗号化するにはRedmineのPGP秘密鍵を生成します
+  note_user_public_key_given: Redmineが送信メールを暗号化する際、このPGP公開鍵を使用します
+  note_server_public_key_missing: Redmineの公開鍵がありません。Redmineに暗号化メールを送りたい場合は管理者にご相談ください
+  note_server_public_key_given: Redmineに暗号化メールを送る場合はこのPGP公開鍵をご使用ください
+  note_server_private_key_create: Redmineに送信されるメールを暗号化するためのRedmineのPGP秘密鍵を保存します
+  note_server_private_key_generate: Redmineに送信されるメールを暗号化するためのRedmineのPGP秘密鍵を生成します
   note_receiving_emails: Redmineでメールを受信するように設定されている必要があります。参照：
   note_cleartext_create: "HTTPでは秘密鍵とパスフレーズは平文で送信されます。HTTPSであることを確認してください。（サーバ側でRakeタスクの使用を推奨）: "
   note_cleartext_generate: "HTTPではパスフレーズは平文で送信されます。HTTPSであることを確認してください。（サーバ側でRakeタスクの使用を推奨）: "
   note_sent_to: 送信先アドレス：
   flash_public_key_not_valid: PGP公開鍵が無効です ('-----BEGIN PGP PUBLIC KEY BLOCK-----' で始まり'-----END PGP PUBLIC KEY BLOCK-----'で終わる必要があります)
   flash_private_key_not_valid: PGP秘密鍵が無効です ('-----BEGIN PGP PUBLIC KEY BLOCK-----' で始まり'-----END PGP PUBLIC KEY BLOCK-----'で終わる必要があります)
-  flash_bad_passphrase: Passphrase was wrong (please try again)
-  flash_key_exists: Key does exist already (please delete it first)
-  flash_key_not_exists: Key does not exist
-  flash_update_not_allowed: Operation not allowed (please don't try)
-  flash_import_error: Error importing the key (please try again or contact your administrator)
-  flash_unknown_error: Unknown error (please try again or contact your administrator)
-  flash_no_secret: Passphrase is empty (no problem, but are you sure?)
-  flash_create_successful: PGP key successfully saved
-  flash_delete_successful: PGP key successfully deleted
-  flash_generate_successful: PGP key successfully generated
+  flash_bad_passphrase: パスフレーズが誤っています (再実行してください)
+  flash_key_exists: 鍵が作成済みです (再実行の前に削除してください)
+  flash_key_not_exists: 鍵がありません
+  flash_update_not_allowed: 操作が許可されません (実行しないでください)
+  flash_import_error: 鍵インポートエラー (再実行するか管理者に連絡してください)
+  flash_unknown_error: 不明なエラー (再実行するか管理者に連絡してください)
+  flash_no_secret: パスフレーズが入力されていません (機能上は問題ありませんが、本当によろしいですか？)
+  flash_create_successful: PGP鍵が正常に作成されました
+  flash_delete_successful: PGP鍵が正常に削除されました
+  flash_generate_successful: PGP鍵が正常に生成されました
   filtered_mail_footer: "This mail was filtered for enhanced security. Follow this link and add your public PGP key to receive unfiltered encrypted mails:"
-  filtered_mail_attachments_added: Attachments added
-  filtered_mail_document_added: Document added
-  filtered_mail_issue_add: Issue added
-  filtered_mail_issue_edit: Issue edited
-  filtered_mail_lost_password: Password requested. Add a PGP key (or contact the administrator) to receive a reset link.
-  filtered_mail_message_posted: Message added
-  filtered_mail_news_added: News added
-  filtered_mail_news_comment_added: Comment added
-  filtered_mail_security_notification: Security notification
-  filtered_mail_wiki_content_added: Page added
-  filtered_mail_wiki_content_updated: Page edited
+  filtered_mail_attachments_added: チケットにファイルが添付されました
+  filtered_mail_document_added: 文書が追加されました
+  filtered_mail_issue_add: チケットが追加されました
+  filtered_mail_issue_edit: チケットが編集されました
+  filtered_mail_lost_password: パスワード再設定が実行されました。パスワード再設定のリンクを受信するにはPGP公開鍵を追加するか、管理者にご相談ください。
+  filtered_mail_message_posted: メッセージが投稿されました
+  filtered_mail_news_added: ニュースが投稿されました
+  filtered_mail_news_comment_added: 注記が追加されました
+  filtered_mail_security_notification: セキュリティ通知
+  filtered_mail_wiki_content_added: Wikiページが追加されました
+  filtered_mail_wiki_content_updated: Wikiページが編集されました
