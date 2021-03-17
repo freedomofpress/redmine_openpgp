@@ -7,7 +7,7 @@ ja:
   label_openpgp_activation: プラグインの有効化対象
   label_unencrypted_mails: 暗号化しないメール
   label_signature_needed: 有効な署名が必要
-  label_encrypted_html: HTML in encrypted mails
+  label_encrypted_html: HTMLで暗号化メールを送る
   label_filtered_mail_footer: フィルタされたメールフッタのカスタマイズ
   label_public_key: PGP公開鍵
   label_private_key: PGP秘密鍵
@@ -36,7 +36,7 @@ ja:
   note_user_public_key_missing: Redmineからのメールを暗号化して受信するには、あなたのPGP公開鍵を登録してください
   note_user_public_key_given: Redmineが送信メールを暗号化する際、このPGP公開鍵を使用します
   note_server_public_key_missing: Redmineの公開鍵がありません。Redmineに暗号化メールを送りたい場合は管理者にご相談ください
-  note_server_public_key_given: Redmineに暗号化メールを送る場合はこのPGP公開鍵をご使用ください
+  note_server_public_key_given: Redmineに暗号化メールを送る場合はこのPGP公開鍵を使用してください
   note_server_private_key_create: Redmineに送信されるメールを暗号化するためのRedmineのPGP秘密鍵を保存します
   note_server_private_key_generate: Redmineに送信されるメールを暗号化するためのRedmineのPGP秘密鍵を生成します
   note_receiving_emails: Redmineでメールを受信するように設定されている必要があります。参照：
@@ -55,7 +55,7 @@ ja:
   flash_create_successful: PGP鍵が正常に作成されました
   flash_delete_successful: PGP鍵が正常に削除されました
   flash_generate_successful: PGP鍵が正常に生成されました
-  filtered_mail_footer: "This mail was filtered for enhanced security. Follow this link and add your public PGP key to receive unfiltered encrypted mails:"
+  filtered_mail_footer: "このメールの本文はセキュリティ上の理由によりフィルタリングされました。以下のリンクからPGP公開鍵を登録すれば本文を暗号化して受信することができます:"
   filtered_mail_attachments_added: チケットにファイルが添付されました
   filtered_mail_document_added: 文書が追加されました
   filtered_mail_issue_add: チケットが追加されました
