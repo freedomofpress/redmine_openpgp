@@ -5,7 +5,7 @@ ja:
   subheader_save_key: 作成済みの秘密鍵を保存する
   subheader_generate_key: 新たな秘密鍵を生成する
   label_openpgp_activation: プラグインの有効化対象
-  label_unencrypted_mails: 暗号化しないメール
+  label_unencrypted_mails: 暗号化されないメール
   label_signature_needed: 有効な署名が必要
   label_encrypted_html: HTMLで暗号化メールを送る
   label_filtered_mail_footer: フィルタされたメールフッタのカスタマイズ
@@ -26,7 +26,7 @@ ja:
   option_activation_project: プロジェクト毎に設定
   option_activation_none: なし
   option_unencrypted_mails_blocked: 送信しない
-  option_unencrypted_mails_filtered: チケットのリンクのみ送信する
+  option_unencrypted_mails_filtered: 内容をフィルタして送信する
   option_unencrypted_mails_unchanged: 内容を変更せずに送信する
   button_create: 保存
   button_delete: 削除
@@ -34,11 +34,11 @@ ja:
   note_login: PGP鍵管理をするにはログインしてください
   note_admin_only: Redmine ServerのPGP秘密鍵およびパスフレーズを変更できるのは管理者のみです
   note_user_public_key_missing: Redmineからのメールを暗号化して受信するには、あなたのPGP公開鍵を登録してください
-  note_user_public_key_given: Redmineが送信メールを暗号化する際、このPGP公開鍵を使用します
-  note_server_public_key_missing: Redmineの公開鍵がありません。Redmineに暗号化メールを送りたい場合は管理者にご相談ください
-  note_server_public_key_given: Redmineに暗号化メールを送る場合はこのPGP公開鍵を使用してください
-  note_server_private_key_create: Redmineに送信されるメールを暗号化するためのRedmineのPGP秘密鍵を保存します
-  note_server_private_key_generate: Redmineに送信されるメールを暗号化するためのRedmineのPGP秘密鍵を生成します
+  note_user_public_key_given: Redmineが送信するメールを暗号化する際、このPGP公開鍵を使用します
+  note_server_public_key_missing: RedmineのPGP公開鍵がありません。Redmineに送信するメールを暗号化する場合は管理者にご相談ください
+  note_server_public_key_given: Redmineに送信するメールを暗号化する際、このPGP公開鍵を使用してください
+  note_server_private_key_create: Redmineに送信するメールを暗号化するためのRedmineのPGP秘密鍵を保存します
+  note_server_private_key_generate: Redmineに送信するメールを暗号化するためのRedmineのPGP秘密鍵を生成します
   note_receiving_emails: Redmineでメールを受信するように設定されている必要があります。参照：
   note_cleartext_create: "HTTPでは秘密鍵とパスフレーズは平文で送信されます。HTTPSであることを確認してください。（サーバ側でRakeタスクの使用を推奨）: "
   note_cleartext_generate: "HTTPではパスフレーズは平文で送信されます。HTTPSであることを確認してください。（サーバ側でRakeタスクの使用を推奨）: "
